@@ -38,7 +38,7 @@ typeset -aHg AGNOSTER_PROMPT_SEGMENTS=(
 
 CURRENT_BG='NONE'
 if [[ -z "$PRIMARY_FG" ]]; then
-	PRIMARY_FG=black
+  PRIMARY_FG=black
 fi
 
 # Characters
@@ -50,6 +50,7 @@ CROSS="\u2718"
 LIGHTNING="\u26a1"
 GEAR="\u2699"
 CLOUD="\u2601"
+TRIANGLE="\u25B8"
 
 # Begin a segment
 # Takes two arguments, background and foreground. Both can be omitted,
@@ -83,10 +84,19 @@ prompt_end() {
 
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
-  local user=`whoami`
+  local ref=''
 
+  local user=`whoami`
   if [[ "$user" != "$DEFAULT_USER" || -n "$SSH_CONNECTION" ]]; then
-    prompt_segment $PRIMARY_FG default " %(!.%{%F{yellow}%}.)$user@%m "
+    ref="${ref} %(!.%{%F{yellow}%}.)$user@%m"
+  fi
+
+  if [[ -n "${STY#[0-9]*.}" ]]; then
+    ref="${ref} %{%F{green}%}${TRIANGLE}${STY#[0-9]*.}"
+  fi
+
+  if [[ -n "${ref}" ]]; then
+    prompt_segment $PRIMARY_FG default "${ref} "
   fi
 }
 
